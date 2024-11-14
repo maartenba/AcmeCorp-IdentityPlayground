@@ -1,0 +1,21 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Weather</h1>
+    
+    <table>
+        @foreach (var weatherForecast in Model.Forecasts)
+        {
+            <tr>
+                <td>@weatherForecast.Date.ToString("yyyy-MM-dd")</td>
+                <td>@weatherForecast.Summary</td>
+                <td>@weatherForecast.TemperatureC C</td>
+                <td>@weatherForecast.TemperatureF F</td>
+            </tr>
+        }
+    </table>
+</div>
