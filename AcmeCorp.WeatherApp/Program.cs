@@ -17,8 +17,8 @@ builder.Services.AddSingleton<WeatherApiClient>();
 builder.Services
     .AddAuthentication(options =>
     {
-        options.DefaultScheme =  CookieAuthenticationDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme =  OpenIdConnectDefaults.AuthenticationScheme;
+        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
     })
     .AddCookie()
     .AddOpenIdConnect(options =>
@@ -32,7 +32,7 @@ builder.Services
         options.ResponseType = "code";
         options.ResponseMode = "query";
         options.UsePkce = true;
-        
+
         options.SaveTokens = true;
         options.GetClaimsFromUserInfoEndpoint = true;
     });
