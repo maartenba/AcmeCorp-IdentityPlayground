@@ -2,6 +2,7 @@ using AcmeCorp.WeatherApp.Models;
 using AcmeCorp.WeatherApp.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,11 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
 
 builder.Services.Configure<IdentityServerSettings>(builder.Configuration.GetSection("IdentityServerSettings"));
+
+// Server-side sessions/logout
+builder.Services.AddTransient<CookieEventHandler>();
+builder.Services.AddSingleton<LogoutSessionManager>();
+
 builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddSingleton<WeatherApiClient>();
 
@@ -20,7 +26,10 @@ builder.Services
         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
     })
-    .AddCookie()
+    .AddCookie(options =>
+    {
+        options.EventsType = typeof(CookieEventHandler);
+    })
     .AddOpenIdConnect(options =>
     {
         options.Authority = builder.Configuration["InteractiveServiceSettings:AuthorityUrl"];
@@ -35,6 +44,13 @@ builder.Services
 
         options.SaveTokens = true;
         options.GetClaimsFromUserInfoEndpoint = true;
+        options.MapInboundClaims = false;
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            NameClaimType = "name",
+            RoleClaimType = "role"
+        };
     });
 
 var app = builder.Build();

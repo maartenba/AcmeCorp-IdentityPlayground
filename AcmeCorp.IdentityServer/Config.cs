@@ -53,8 +53,9 @@ public static class Config
                 AllowedGrantTypes = GrantTypes.Code,
 
                 RedirectUris = { "https://localhost:5444/signin-oidc" },
-                FrontChannelLogoutUri = "https://localhost:5444/signout-oidc",
+                BackChannelLogoutUri = "https://localhost:5444/logout",
                 PostLogoutRedirectUris = { "https://localhost:5444/signout-callback-oidc" },
+                CoordinateLifetimeWithUserSession = true, // slide server-side session
 
                 AllowOfflineAccess = true,
                 AllowedScopes = { "openid", "profile", "weatherapi.read" },
