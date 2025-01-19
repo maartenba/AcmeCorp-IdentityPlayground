@@ -14,6 +14,8 @@ builder.Services
 
         options.EmitStaticAudienceClaim = true;
 
+        options.PushedAuthorization.AllowUnregisteredPushedRedirectUris = true;
+
         options.ServerSideSessions.UserDisplayNameClaimType = "name"; // this sets the "name" claim as the display name in the admin tool
         options.ServerSideSessions.RemoveExpiredSessions = true; // removes expired sessions. defaults to true.
         options.ServerSideSessions.ExpiredSessionsTriggerBackchannelLogout = true; // this triggers notification to clients. defaults to false.
@@ -23,7 +25,8 @@ builder.Services
     .AddInMemoryApiResources(Config.ApiResources)
     .AddInMemoryApiScopes(Config.ApiScopes)
     .AddInMemoryIdentityResources(Config.IdentityResources)
-    .AddServerSideSessions();
+    .AddServerSideSessions()
+    .AddJwtBearerClientAuthentication();
 
 var app = builder.Build();
 

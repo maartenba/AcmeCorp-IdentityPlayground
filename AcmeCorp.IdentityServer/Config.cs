@@ -79,5 +79,28 @@ public static class Config
                 
                 RequireConsent = true
             },
+
+            new Client
+            {
+                ClientId = "interactive.confidential.short.jwt",
+                ClientName = "Interactive client (Code with PKCE) using private key JWT authentication with short access token lifetime",
+
+                RedirectUris = { "https://notused" },
+                PostLogoutRedirectUris = { "https://notused" },
+
+                ClientSecrets = { PublicKey },
+
+                AllowedGrantTypes = GrantTypes.Code,
+                RequireRequestObject = false,
+                AllowedScopes = { "openid", "profile", "weatherapi.read" },
+
+                RequireConsent = true,
+
+                AllowOfflineAccess = true,
+                RefreshTokenUsage = TokenUsage.ReUse,
+                RefreshTokenExpiration = TokenExpiration.Sliding,
+
+                AccessTokenLifetime = 75
+            },
         };
 }
