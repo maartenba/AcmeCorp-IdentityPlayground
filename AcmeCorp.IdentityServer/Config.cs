@@ -1,4 +1,5 @@
-﻿using Duende.IdentityServer.Models;
+﻿using Duende.IdentityServer;
+using Duende.IdentityServer.Models;
 
 public static class Config
 {
@@ -27,6 +28,22 @@ public static class Config
             ApiSecrets = { new Secret("ScopeSecret".Sha256()) },
             UserClaims = { "role" }
         }
+    };
+
+    private static Secret PublicKey = new Secret
+    {
+        Type = IdentityServerConstants.SecretTypes.JsonWebKey,
+        Value =
+            """
+            {
+                "kty": "RSA",
+                "e": "AQAB",
+                "use": "sig",
+                "kid": "gh2BICAt02U7phWeOSlLH3oSJNCj8rwdjQyOm260Cs0",
+                "alg": "RS256",
+                "n": "iCCroKELTEoZyW3gTW8lc7-QQtF-ERtpgHtJsgPVkm0ljLoVV0tmm-7cb_WxdWo1ObFaPKaan2hDMNslOUMJHMzLgmtbVwvZiQGbBB_FYEA0u2VcD0T8BxnKvn5j9hj2GHumZoRXXGmlY9skk2olXUpXd82iR_FXwkLw_sgid-YlfA60nE0x_6YJN5s8xlLha_SzQwR0kUJ37LsfP5Rj6ydNWLrJ_uv7r6Pr4PGOSpmnV3CvrTYlQq4-4wBN595itknaImZlM3_weQL77nNt_wew2lSXfaKOJp6DFoj2olIvUDkdb0vgPmNaN3lvL2mX5jwkPHaIXf0Lu2wQ-KNoaw"
+            }
+            """
     };
 
     public static IEnumerable<Client> Clients =>

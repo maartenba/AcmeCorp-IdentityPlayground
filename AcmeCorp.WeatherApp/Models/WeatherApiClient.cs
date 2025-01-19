@@ -24,7 +24,7 @@ public class WeatherApiClient
         
         var httpContext = _contextAccessor.HttpContext;
         var token = httpContext is null 
-            ? (await  _tokenService.GetTokenAsync("weatherapi.read")).AccessToken
+            ? (await _tokenService.GetTokenAsync("weatherapi.read")).AccessToken
             : await httpContext.GetTokenAsync("access_token");
 
         using var httpClient = _httpClientFactory.CreateClient();
