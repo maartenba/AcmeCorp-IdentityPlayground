@@ -70,8 +70,9 @@ public static class Config
                 AllowedGrantTypes = GrantTypes.Code,
 
                 RedirectUris = { "https://localhost:5444/signin-oidc" },
-                BackChannelLogoutUri = "https://localhost:5444/logout",
-                PostLogoutRedirectUris = { "https://localhost:5444/signout-callback-oidc" },
+                //BackChannelLogoutUri = "https://localhost:5444/logout",
+                FrontChannelLogoutUri = "https://localhost:5444/signout-oidc",
+                PostLogoutRedirectUris = { "https://localhost:5444/" },
                 CoordinateLifetimeWithUserSession = true, // slide server-side session
 
                 AllowOfflineAccess = true,

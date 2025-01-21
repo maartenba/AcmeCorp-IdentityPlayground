@@ -4,6 +4,8 @@ using System.Text.Json;
 using AcmeCorp.WeatherApp.Services;
 using Duende.IdentityModel;
 using Duende.IdentityModel.Client;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -23,6 +25,19 @@ public class LogoutModel : PageModel
         _logoutSessions = logoutSessions;
         _discoveryCache = discoveryCache;
         _logger = logger;
+    }
+
+    public IActionResult OnPostFrontChannel()
+    {
+        Response.Headers.Append("Cache-Control", "no-cache, no-store");
+        Response.Headers.Append("Pragma", "no-cache");
+
+        var authenticationProperties = new AuthenticationProperties
+        {
+            RedirectUri = "https://localhost:5444/",
+        };
+
+        return SignOut(authenticationProperties, OpenIdConnectDefaults.AuthenticationScheme, CookieAuthenticationDefaults.AuthenticationScheme);
     }
 
     public async Task<IActionResult> OnPostBackChannelAsync([FromForm(Name = "logout_token")] string? logoutToken)
