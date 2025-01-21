@@ -1,3 +1,5 @@
+using Duende.IdentityServer;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,6 +29,16 @@ builder.Services
     .AddInMemoryIdentityResources(Config.IdentityResources)
     .AddServerSideSessions()
     .AddJwtBearerClientAuthentication();
+
+builder.Services.AddAuthentication()
+    .AddGoogle("Google", options =>
+    {
+        options.ClientId = "517997330312-a8g0f4plbr5cb54pntcu3j59tdbsu1pi.apps.googleusercontent.com";
+        options.ClientSecret = "OezONvJiWNfn9GrRpQt3hQ-_";
+        options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+
+        options.ClaimActions.MapAll();
+    });
 
 var app = builder.Build();
 
