@@ -37,6 +37,7 @@ builder.Services
     .AddCookie(options =>
     {
         options.EventsType = typeof(CookieEventHandler);
+        options.Cookie.Name = "AcmeCorp.WeatherApp";
     })
     .AddOpenIdConnect(options =>
     {
@@ -53,6 +54,7 @@ builder.Services
         options.SaveTokens = true;
         options.GetClaimsFromUserInfoEndpoint = true;
         options.MapInboundClaims = false;
+        options.DisableTelemetry = true;
 
         options.TokenValidationParameters = new TokenValidationParameters
         {
