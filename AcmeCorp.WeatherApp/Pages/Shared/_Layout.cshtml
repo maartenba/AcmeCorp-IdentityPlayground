@@ -31,7 +31,7 @@
                                 @(User.Identity.Name ?? User.FindFirst("name")?.Value ?? "User")
                             </a>
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarAccountMenuLink">
-                                <form asp-page="/Logout">
+                                <form asp-page="/Logout" asp-page-handler="BackChannel">
                                     <button type="submit" class="dropdown-item btn btn-link">Logout</button>
                                 </form>
                             </div>

@@ -15,15 +15,17 @@ namespace AcmeCorp.WeatherApp.Pages;
 public class LogoutModel : PageModel
 {
     private readonly LogoutSessionManager _logoutSessions;
+    private readonly IDiscoveryCache _discoveryCache;
     private readonly ILogger<LogoutModel> _logger;
 
-    public LogoutModel(LogoutSessionManager logoutSessions, ILogger<LogoutModel> logger)
+    public LogoutModel(LogoutSessionManager logoutSessions, IDiscoveryCache discoveryCache, ILogger<LogoutModel> logger)
     {
         _logoutSessions = logoutSessions;
+        _discoveryCache = discoveryCache;
         _logger = logger;
     }
 
-    public async Task<IActionResult> OnPostAsync([FromForm(Name = "logout_token")] string? logoutToken)
+    public async Task<IActionResult> OnPostBackChannelAsync([FromForm(Name = "logout_token")] string? logoutToken)
     {
         Response.Headers.Append("Cache-Control", "no-cache, no-store");
         Response.Headers.Append("Pragma", "no-cache");
@@ -72,16 +74,15 @@ public class LogoutModel : PageModel
         return claims;
     }
 
-    private static async Task<ClaimsPrincipal> ValidateJwt(string jwt)
+    private async Task<ClaimsPrincipal> ValidateJwt(string jwt)
     {
         // read discovery document to find issuer and key material
-        var client = new HttpClient();
-        var disco = await client.GetDiscoveryDocumentAsync("https://localhost:5443");
+        var disco = await _discoveryCache.GetAsync();
 
         var keys = new List<SecurityKey>();
         foreach (var webKey in disco.KeySet.Keys)
         {
-            var key = new JsonWebKey()
+            var key = new JsonWebKey
             {
                 Kty = webKey.Kty,
                 Alg = webKey.Alg,

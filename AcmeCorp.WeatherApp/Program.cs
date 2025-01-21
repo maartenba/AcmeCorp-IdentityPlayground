@@ -1,5 +1,6 @@
 using AcmeCorp.WeatherApp.Models;
 using AcmeCorp.WeatherApp.Services;
+using Duende.IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
@@ -12,6 +13,13 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
 
 builder.Services.Configure<IdentityServerSettings>(builder.Configuration.GetSection("IdentityServerSettings"));
+
+builder.Services.AddSingleton<IDiscoveryCache>(services =>
+{
+    var identityServerSettings = services.GetRequiredService<IdentityServerSettings>();
+    var factory = services.GetRequiredService<IHttpClientFactory>();
+    return new DiscoveryCache(identityServerSettings.DiscoveryUrl, () => factory.CreateClient());
+});
 
 // Server-side sessions/logout
 builder.Services.AddTransient<CookieEventHandler>();
