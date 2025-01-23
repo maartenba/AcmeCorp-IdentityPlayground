@@ -1,6 +1,5 @@
 using Duende.IdentityServer;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +37,19 @@ builder.Services.AddAuthentication()
         options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
 
         options.ClaimActions.MapAll();
+
+        // options.Events.OnTicketReceived = n =>
+        // {
+        //     // var idSvc =
+        //     //     n.HttpContext.RequestServices.GetRequiredService<MovieIdentityService>();
+        //     //
+        //     // var appClaims =
+        //     //     idSvc.GetClaimsForUser(n.Principal.FindFirst("sub")?.Value);
+        //
+        //     n.Principal.Identities.First().AddClaim(new Claim("yo", "yo"));
+        //
+        //     return Task.CompletedTask;
+        // };
     });
 
 var app = builder.Build();
