@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+  identityserver-mssql-server:
+    image: "mcr.microsoft.com/azure-sql-edge:latest"
+    ports:
+      - "1433:1433"
+    volumes:
+      - identityserver-mssql-server-linux:/var/opt/mssql
+    environment:
+      SA_PASSWORD: "FYL0g0Yn58xxUJT2al3tTq5qku0NmAxFRfAUHF7M"
+      ACCEPT_EULA: "Y"
+
+volumes:
+  identityserver-mssql-server-linux:

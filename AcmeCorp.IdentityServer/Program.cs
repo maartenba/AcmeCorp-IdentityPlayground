@@ -1,5 +1,12 @@
+using System.Reflection;
 using Duende.IdentityServer;
+using Duende.IdentityServer.EntityFramework.DbContexts;
+using Duende.IdentityServer.EntityFramework.Mappers;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
+
+const string connectionString = @"Server=localhost,1433;Database=identityserver;User Id=sa;Password=FYL0g0Yn58xxUJT2al3tTq5qku0NmAxFRfAUHF7M;TrustServerCertificate=True";
+var migrationsAssembly = typeof(Program).GetTypeInfo().Assembly.GetName().Name;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +27,21 @@ builder.Services
         options.ServerSideSessions.UserDisplayNameClaimType = "name"; // this sets the "name" claim as the display name in the admin tool
         options.ServerSideSessions.RemoveExpiredSessions = true; // removes expired sessions. defaults to true.
         options.ServerSideSessions.ExpiredSessionsTriggerBackchannelLogout = true; // this triggers notification to clients. defaults to false.
+    })
+    .AddConfigurationStore(options =>
+    {
+        options.ConfigureDbContext = builder =>
+            builder.UseSqlServer(connectionString,
+                sql => sql.MigrationsAssembly(migrationsAssembly));
+    })
+    .AddOperationalStore(options =>
+    {
+        options.EnableTokenCleanup = true;
+        options.TokenCleanupInterval = 30;
+
+        options.ConfigureDbContext = builder =>
+            builder.UseSqlServer(connectionString,
+                sql => sql.MigrationsAssembly(migrationsAssembly));
     })
     .AddTestUsers(TestUsers.Users)
     .AddInMemoryClients(Config.Clients)
@@ -61,4 +83,18 @@ app.UseRouting();
 app.UseAuthorization();
 app.MapRazorPages().RequireAuthorization();
 
+InitializeDatabase(app);
+
 app.Run();
+
+static void InitializeDatabase(IApplicationBuilder app)
+{
+    using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>()!.CreateScope())
+    {
+        var persistedGrantsContext = serviceScope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>();
+        persistedGrantsContext.Database.Migrate();
+
+        var configurationContext = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
+        configurationContext.Database.Migrate();
+    }
+}

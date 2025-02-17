@@ -8,6 +8,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcmeCorp.WeatherApp", "Acme
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcmeCorp.Console", "AcmeCorp.Console\AcmeCorp.Console.csproj", "{5B5A216A-088F-44F4-8268-71D2773BBB3B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_", "_", "{E36D996D-85AD-4054-83E4-F2F0798D5177}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".config", ".config", "{6A2BC6AD-6673-4F92-A9BD-885F4FB39927}"
+	ProjectSection(SolutionItems) = preProject
+		dotnet-tools.json = .config\dotnet-tools.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +40,8 @@ Global
 		{5B5A216A-088F-44F4-8268-71D2773BBB3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B5A216A-088F-44F4-8268-71D2773BBB3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B5A216A-088F-44F4-8268-71D2773BBB3B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6A2BC6AD-6673-4F92-A9BD-885F4FB39927} = {E36D996D-85AD-4054-83E4-F2F0798D5177}
 	EndGlobalSection
 EndGlobal
