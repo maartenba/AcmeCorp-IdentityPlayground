@@ -18,9 +18,9 @@ builder.Services.Configure<IdentityServerSettings>(builder.Configuration.GetSect
 
 builder.Services.AddSingleton<IDiscoveryCache>(services =>
 {
-    var identityServerSettings = services.GetRequiredService<IOptions<IdentityServerSettings>>().Value;
+    var identityServerSettings = services.GetRequiredService<IOptions<IdentityServerSettings>>();
     var factory = services.GetRequiredService<IHttpClientFactory>();
-    return new DiscoveryCache(identityServerSettings.DiscoveryUrl, () => factory.CreateClient());
+    return new DiscoveryCache(identityServerSettings.Value.DiscoveryUrl, () => factory.CreateClient());
 });
 
 // Server-side sessions/logout
