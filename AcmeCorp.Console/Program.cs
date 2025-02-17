@@ -12,7 +12,7 @@ namespace AcmeCorp.Console;
 
 public static class Program
 {
-    static string _api = "https://localhost:5445/weatherforecast";
+    static string _api = "http://localhost:5445/weatherforecast";
 
     static OidcClient _oidcClient;
     static HttpClient _apiClient = new HttpClient { BaseAddress = new Uri(_api) };
@@ -71,7 +71,7 @@ public static class Program
         // requires the OP to allow random ports on 127.0.0.1 - otherwise set a static port
         var browser = new SystemBrowser();
         var redirectUri = string.Format($"http://127.0.0.1:{browser.Port}");
-        var authority = "https://localhost:5443";
+        var authority = "http://localhost:5443";
 
         var jwk = new JsonWebKey(rsaKey);
         var credential = new SigningCredentials(jwk, "RS256");

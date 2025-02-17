@@ -30,7 +30,7 @@ public class WeatherApiClient
         using var httpClient = _httpClientFactory.CreateClient();
         httpClient.SetBearerToken(token ?? throw new InvalidOperationException("Access token is not available."));
         
-        await foreach (var forecast in httpClient.GetFromJsonAsAsyncEnumerable<WeatherForecast>("https://localhost:5445/weatherforecast", cancellationToken))
+        await foreach (var forecast in httpClient.GetFromJsonAsAsyncEnumerable<WeatherForecast>("http://localhost:5445/weatherforecast", cancellationToken))
         {
             if (forecasts?.Count >= maxItems)
             {

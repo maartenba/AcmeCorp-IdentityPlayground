@@ -34,7 +34,7 @@ public class LogoutModel : PageModel
 
         var authenticationProperties = new AuthenticationProperties
         {
-            RedirectUri = "https://localhost:5444/",
+            RedirectUri = "http://localhost:5444/",
         };
 
         return SignOut(authenticationProperties, OpenIdConnectDefaults.AuthenticationScheme, CookieAuthenticationDefaults.AuthenticationScheme);

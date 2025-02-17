@@ -1,9 +1,13 @@
 using Duende.IdentityServer;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
+
+builder.Services.AddSingleton<IPostConfigureOptions<CookieAuthenticationOptions>, MakeCookiesHttp>();
 
 builder.Services
     .AddIdentityServer(options =>
@@ -62,3 +66,12 @@ app.UseAuthorization();
 app.MapRazorPages().RequireAuthorization();
 
 app.Run();
+
+public class MakeCookiesHttp : IPostConfigureOptions<CookieAuthenticationOptions>
+{
+    public void PostConfigure(string? name, CookieAuthenticationOptions options)
+    {
+        options.Cookie.SecurePolicy = CookieSecurePolicy.None;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+    }
+}

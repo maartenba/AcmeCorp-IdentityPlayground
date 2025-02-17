@@ -46,7 +46,9 @@ builder.Services
         options.Authority = builder.Configuration["InteractiveServiceSettings:AuthorityUrl"];
         options.ClientId = builder.Configuration["InteractiveServiceSettings:ClientId"];
         options.ClientSecret = builder.Configuration["InteractiveServiceSettings:ClientSecret"];
-        
+
+        options.RequireHttpsMetadata = false;
+
         options.Scope.Add(builder.Configuration["InteractiveServiceSettings:Scopes:0"]);
         
         options.ResponseType = "code";
