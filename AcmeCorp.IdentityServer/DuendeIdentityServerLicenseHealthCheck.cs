@@ -22,29 +22,16 @@ public class DuendeIdentityServerLicenseHealthCheck(
 
         if (license != null)
         {
-            healthCheckData["edition"] = license.Edition;
-            healthCheckData["company_name"] = license.CompanyName;
-
             if (license.Expiration != null)
             {
                 healthCheckData["expiration"] = license.Expiration;
             }
-
-            healthCheckData["clients_limit"] = license.ClientLimit ?? -1;
-            healthCheckData["issuers_limit"] = license.IssuerLimit ?? -1;
         }
 
         if (licenseUsageSummary != null)
         {
-            healthCheckData["edition"] = licenseUsageSummary.LicenseEdition;
-
             healthCheckData["clients_count"]  = licenseUsageSummary.ClientsUsed.Count;
-            healthCheckData["clients_used"]  = licenseUsageSummary.ClientsUsed;
-
             healthCheckData["issuers_count"]  = licenseUsageSummary.IssuersUsed.Count;
-            healthCheckData["issuers_used"]  = licenseUsageSummary.IssuersUsed;
-
-            healthCheckData["features_used"]  = licenseUsageSummary.FeaturesUsed;
         }
 
         if (environment.IsProduction())
