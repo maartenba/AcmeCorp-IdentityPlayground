@@ -5,9 +5,9 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 namespace AcmeCorp.IdentityServer;
 
 public class DuendeIdentityServerLicenseHealthCheck(
-    IdentityServerLicense? license,
+    IHostEnvironment environment,
     LicenseUsageSummary? licenseUsageSummary,
-    IHostEnvironment environment)
+    IdentityServerLicense? license = null)
     : IHealthCheck
 {
     public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
