@@ -7,6 +7,7 @@ public static class Config
     [
         new IdentityResources.OpenId(),
         new IdentityResources.Profile(),
+        new IdentityResources.Email(),
         new IdentityResource
         {
             Name = "role",
@@ -76,7 +77,7 @@ public static class Config
                 CoordinateLifetimeWithUserSession = true, // slide server-side session
 
                 AllowOfflineAccess = true,
-                AllowedScopes = { "openid", "profile", "weatherapi.read" },
+                AllowedScopes = { "openid", "profile", "email", "weatherapi.read" },
                 
                 RequireConsent = true
             },
@@ -93,7 +94,7 @@ public static class Config
 
                 AllowedGrantTypes = GrantTypes.Code,
                 RequireRequestObject = false,
-                AllowedScopes = { "openid", "profile", "weatherapi.read" },
+                AllowedScopes = { "openid", "profile", "email", "weatherapi.read" },
 
                 RequireConsent = true,
 

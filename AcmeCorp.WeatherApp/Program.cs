@@ -48,6 +48,7 @@ builder.Services
         options.ClientSecret = builder.Configuration["InteractiveServiceSettings:ClientSecret"];
         
         options.Scope.Add(builder.Configuration["InteractiveServiceSettings:Scopes:0"]);
+        options.Scope.Add("email");
         
         options.ResponseType = "code";
         options.ResponseMode = "query";
