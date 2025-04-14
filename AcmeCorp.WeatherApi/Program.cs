@@ -12,6 +12,8 @@ builder.Services
         options.Authority = "https://localhost:5443/";
         options.Audience = "weatherapi";
         
+        options.MapInboundClaims = false;
+        
         options.TokenValidationParameters.ValidTypes = ["at+jwt"];
     });;
 
@@ -45,6 +47,7 @@ app.MapGet("/weatherforecast", () =>
                     summaries[Random.Shared.Next(summaries.Length)]
                 ))
             .ToArray();
+        
         return forecast;
     })
     .WithName("GetWeatherForecast")

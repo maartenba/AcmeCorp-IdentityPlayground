@@ -27,7 +27,7 @@ public static class Config
         {
             Scopes = { "weatherapi.read", "weatherapi.write" },
             ApiSecrets = { new Secret("ScopeSecret".Sha256()) },
-            UserClaims = { "role" }
+            UserClaims = { "email", "role" }
         }
     };
 
