@@ -1,8 +1,10 @@
 using System.Text;
 using System.Text.Json;
 using AcmeCorp.IdentityServer;
+using AcmeCorp.IdentityServer.DynamicProviders;
 using Duende.IdentityServer;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
@@ -21,11 +23,26 @@ builder.Services
         options.EmitStaticAudienceClaim = true;
 
         options.PushedAuthorization.AllowUnregisteredPushedRedirectUris = true;
+        
+        options.DynamicProviders.PathPrefix = "/federation";
+        options.DynamicProviders
+            .AddProviderType<GoogleHandler, GoogleOptions, GoogleIdentityProvider>(
+                GoogleIdentityProvider.ProviderType);
 
         options.ServerSideSessions.UserDisplayNameClaimType = "name"; // this sets the "name" claim as the display name in the admin tool
         options.ServerSideSessions.RemoveExpiredSessions = true; // removes expired sessions. defaults to true.
         options.ServerSideSessions.ExpiredSessionsTriggerBackchannelLogout = true; // this triggers notification to clients. defaults to false.
     })
+    .AddInMemoryIdentityProviders([
+        new GoogleIdentityProvider
+        {
+            Scheme = "google1",
+            DisplayName = "Google (dynamic)",
+            Enabled = true,
+            ClientId = "...",
+            ClientSecret = "..."
+        }
+    ])
     .AddTestUsers(TestUsers.Users)
     .AddInMemoryClients(Config.Clients)
     .AddInMemoryApiResources(Config.ApiResources)
@@ -34,6 +51,9 @@ builder.Services
     .AddServerSideSessions()
     .AddJwtBearerClientAuthentication()
     .AddLicenseSummary();
+
+builder.Services.ConfigureOptions<GoogleDynamicConfigureOptions>();
+builder.Services.ConfigureOptions<OAuthPostConfigureOptions<GoogleOptions, GoogleHandler>>();
 
 builder.Services.AddAuthentication()
     .AddGoogle("Google", options =>
