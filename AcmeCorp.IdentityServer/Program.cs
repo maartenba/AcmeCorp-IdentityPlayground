@@ -3,7 +3,6 @@ using System.Text.Json;
 using AcmeCorp.IdentityServer;
 using AcmeCorp.IdentityServer.DynamicProviders;
 using Duende.IdentityServer;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -53,17 +52,15 @@ builder.Services
     .AddLicenseSummary();
 
 builder.Services.ConfigureOptions<GoogleDynamicConfigureOptions>();
-builder.Services.ConfigureOptions<OAuthPostConfigureOptions<GoogleOptions, GoogleHandler>>();
 
 builder.Services.AddAuthentication()
-    .AddGoogle("Google", options =>
+    .AddGoogleOpenIdConnect(authenticationScheme: "Google", displayName: "Google", configureOptions: options =>
     {
         options.ClientId = "517997330312-a8g0f4plbr5cb54pntcu3j59tdbsu1pi.apps.googleusercontent.com";
         options.ClientSecret = "OezONvJiWNfn9GrRpQt3hQ-_";
         options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
-
-        options.ClaimActions.MapAll();
-
+        options.CallbackPath = "/signin-google";
+        
         // options.Events.OnTicketReceived = n =>
         // {
         //     // var idSvc =
