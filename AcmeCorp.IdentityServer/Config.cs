@@ -70,6 +70,7 @@ public static class Config
 
                 AllowedGrantTypes = GrantTypes.Code,
 
+                InitiateLoginUri = "https://localhost:5444/signin-idp",
                 RedirectUris = { "https://localhost:5444/signin-oidc" },
                 //BackChannelLogoutUri = "https://localhost:5444/logout",
                 FrontChannelLogoutUri = "https://localhost:5444/signout-oidc",

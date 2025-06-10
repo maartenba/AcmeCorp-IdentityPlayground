@@ -86,4 +86,14 @@ app.UseAuthorization();
 app.MapStaticAssets();
 app.MapRazorPages().WithStaticAssets();
 
+app.MapGet("/signin-idp", async (HttpContext http) =>
+{
+    if (http.User.Identity is { IsAuthenticated: false })
+    {
+        return Results.Challenge();
+    }
+    
+    return Results.Redirect("/");
+});
+
 app.Run();

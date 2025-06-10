@@ -3,6 +3,7 @@ using System.Text.Json;
 using AcmeCorp.IdentityServer;
 using AcmeCorp.IdentityServer.DynamicProviders;
 using Duende.IdentityServer;
+using IdentityServerHost.Pages.Portal;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -74,6 +75,8 @@ builder.Services.AddAuthentication()
         //     return Task.CompletedTask;
         // };
     });
+
+builder.Services.AddSingleton<ClientRepository>();
 
 builder.Services.AddHealthChecks()
     .AddCheck<DuendeIdentityServerLicenseHealthCheck>("identityserver");
