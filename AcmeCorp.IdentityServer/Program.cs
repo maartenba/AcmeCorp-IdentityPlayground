@@ -79,7 +79,7 @@ builder.Services.AddAuthentication()
 builder.Services.AddSingleton<ClientRepository>();
 
 builder.Services.AddHealthChecks()
-    .AddCheck<DuendeIdentityServerLicenseHealthCheck>("identityserver");
+    .AddCheck<DuendeIdentityServerLicenseHealthCheck>("identityserver", HealthStatus.Degraded);
 
 var app = builder.Build();
 
