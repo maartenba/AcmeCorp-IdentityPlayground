@@ -7,6 +7,7 @@ using IdentityServerHost.Pages.Portal;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using NReco.Logging.File;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +33,8 @@ builder.Services
         options.ServerSideSessions.UserDisplayNameClaimType = "name"; // this sets the "name" claim as the display name in the admin tool
         options.ServerSideSessions.RemoveExpiredSessions = true; // removes expired sessions. defaults to true.
         options.ServerSideSessions.ExpiredSessionsTriggerBackchannelLogout = true; // this triggers notification to clients. defaults to false.
+        
+        options.Diagnostics.LogFrequency = TimeSpan.FromMinutes(10);
     })
     .AddInMemoryIdentityProviders([
         new GoogleIdentityProvider
@@ -80,6 +83,16 @@ builder.Services.AddSingleton<ClientRepository>();
 
 builder.Services.AddHealthChecks()
     .AddCheck<DuendeIdentityServerLicenseHealthCheck>("identityserver", HealthStatus.Degraded);
+
+builder.Services.AddLogging(configure =>
+{
+    configure.AddFile("diagnostics.log", options =>
+    {
+        options.Append = true;
+        options.FilterLogEntry = entry =>
+            entry.LogName == "Duende.IdentityServer.Diagnostics.Summary";
+    });
+});
 
 var app = builder.Build();
 
