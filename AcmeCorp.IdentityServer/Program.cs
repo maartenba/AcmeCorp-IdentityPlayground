@@ -1,17 +1,36 @@
 using System.Text;
 using System.Text.Json;
 using AcmeCorp.IdentityServer;
+using AcmeCorp.IdentityServer.Data;
 using AcmeCorp.IdentityServer.DynamicProviders;
+using AcmeCorp.IdentityServer.Models;
 using Duende.IdentityServer;
 using IdentityServerHost.Pages.Portal;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using NReco.Logging.File;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
+
+builder.Services.AddSingleton<IEmailSender, LoggingEmailSender>();
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+    {
+        options.SignIn.RequireConfirmedAccount = true;
+        
+        options.Stores.SchemaVersion = IdentitySchemaVersions.Version3;
+    })
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services
     .AddIdentityServer(options =>
@@ -46,7 +65,7 @@ builder.Services
             ClientSecret = "..."
         }
     ])
-    .AddTestUsers(TestUsers.Users)
+    .AddAspNetIdentity<ApplicationUser>()
     .AddInMemoryClients(Config.Clients)
     .AddInMemoryApiResources(Config.ApiResources)
     .AddInMemoryApiScopes(Config.ApiScopes)
@@ -107,6 +126,7 @@ app.MapHealthChecks("health", new HealthCheckOptions
 });
 app.MapRazorPages().RequireAuthorization();
 
+await SeedData.EnsureSeedDataAsync(app);
 app.Run();
 
 static Task WriteResponse(HttpContext context, HealthReport healthReport)
