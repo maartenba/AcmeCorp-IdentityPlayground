@@ -124,6 +124,7 @@ app.MapHealthChecks("health", new HealthCheckOptions
 {
    ResponseWriter = WriteResponse
 });
+app.MapPasskeyEndpoints();
 app.MapRazorPages().RequireAuthorization();
 
 await SeedData.EnsureSeedDataAsync(app);

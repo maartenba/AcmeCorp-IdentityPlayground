@@ -1,4 +1,5 @@
 @page
+@using AcmeCorp.IdentityServer
 @model IdentityServerHost.Pages.Login.Index
 
 <div class="login-page">
@@ -25,7 +26,7 @@
 
                             <div class="form-group">
                                 <label asp-for="Input.Username"></label>
-                                <input class="form-control" placeholder="Username" asp-for="Input.Username" autofocus>
+                                <input class="form-control" placeholder="Username" asp-for="Input.Username" autofocus autocomplete="username webauthn">
                             </div>
                             <div class="form-group">
                                 <label asp-for="Input.Password"></label>
@@ -46,6 +47,12 @@
                             
                             <button class="btn btn-primary" name="Input.Button" value="login">Login</button>
                             <button class="btn btn-secondary" name="Input.Button" value="cancel">Cancel</button>
+                    
+                            <br />
+                    
+                            <passkey-submit operation="@PasskeyOperation.Request" name="Input.Passkey" email-name="Input.Username" class="btn btn-outline-primary position-relative" formnovalidate>
+                                Log in with a passkey
+                            </passkey-submit>
                         </form>
                     </div>
                 </div>
@@ -87,3 +94,8 @@
         }
     </div>
 </div>
+
+@section scripts
+{
+    <script src="~/js/passkey-submit.js" asp-append-version="true"></script>
+}

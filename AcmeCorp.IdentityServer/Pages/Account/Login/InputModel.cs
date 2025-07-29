@@ -2,6 +2,7 @@
 // See LICENSE in the project root for license information.
 
 using System.ComponentModel.DataAnnotations;
+using AcmeCorp.IdentityServer.Models;
 
 namespace IdentityServerHost.Pages.Login;
 
@@ -14,4 +15,6 @@ public class InputModel
     public bool RememberLogin { get; set; }
     public string? ReturnUrl { get; set; }
     public string? Button { get; set; }
+        
+    public PasskeyInputModel? Passkey { get; set; }
 }
