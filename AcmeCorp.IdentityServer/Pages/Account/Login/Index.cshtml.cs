@@ -64,7 +64,7 @@ public class Index : PageModel
         var context = await _interaction.GetAuthorizationContextAsync(Input.ReturnUrl);
 
         // the user clicked the "cancel" button
-        if (Input.Button != "login" && Input.Button != "__passkeySubmit")
+        if (Input.Button != "login" && Input.Button != "__passkeySubmit" && Input.Button != null)
         {
             if (context != null)
             {
@@ -114,11 +114,10 @@ public class Index : PageModel
             {
                 user = options.UserId is { Length: > 0 } userId 
                     ? await _userManager.FindByIdAsync(userId) 
-                    : null;
+                    : await _userManager.GetUserAsync(User);
             }
         }
-
-        if (ModelState.IsValid)
+        else if (ModelState.IsValid)
         {
             // Only remember login if allowed
             var rememberLogin = LoginOptions.AllowRememberLogin && Input.RememberLogin;
@@ -130,7 +129,7 @@ public class Index : PageModel
             }
         }
 
-        if (result.Succeeded && user != null)
+        if (result?.Succeeded == true && user != null)
         {
             await _events.RaiseAsync(new UserLoginSuccessEvent(user!.UserName, user.Id, user.UserName, clientId: context?.Client.ClientId));
             Telemetry.Metrics.UserLogin(context?.Client.ClientId, IdentityServerConstants.LocalIdentityProvider);
