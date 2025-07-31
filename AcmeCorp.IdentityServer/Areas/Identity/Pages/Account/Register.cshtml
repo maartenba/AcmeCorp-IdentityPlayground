@@ -1,4 +1,5 @@
 ﻿@page
+@using AcmeCorp.IdentityServer
 @model RegisterModel
 @{
     ViewData["Title"] = "Register";
@@ -29,6 +30,18 @@
             </div>
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
         </form>
+        
+                    
+        <hr />
+                
+        <div class="mb-3">
+            <form id="passkey" asp-page="./RegisterPasskey" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                <passkey-submit operation="@PasskeyOperation.Create" name="Input.Passkey" email-name="Input.Email" class="btn btn-lg btn-primary">
+                    Register with a passkey
+                </passkey-submit>
+            </form>
+        </div>
+       
     </div>
     @* <div class="col-md-6 col-md-offset-2"> *@
     @*     <section> *@
@@ -64,4 +77,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/passkey-submit.js" asp-append-version="true"></script>
 }
