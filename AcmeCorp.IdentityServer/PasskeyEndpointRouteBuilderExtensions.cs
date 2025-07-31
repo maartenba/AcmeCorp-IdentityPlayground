@@ -17,16 +17,25 @@ public static class PasskeyEndpointRouteBuilderExtensions
             [FromServices] UserManager<ApplicationUser> userManager,
             [FromServices] SignInManager<ApplicationUser> signInManager) =>
         {
+            PasskeyUserEntity? passkeyUserEntity = null;
+            
+            // 1. Try to associate new passkey with currently logged-in user
             var user = await userManager.GetUserAsync(context.User);
-            if (user is null)
+            if (user != null)
             {
-                return Results.NotFound($"Unable to load user with ID '{userManager.GetUserId(context.User)}'.");
+                var userId = await userManager.GetUserIdAsync(user);
+                var userName = await userManager.GetUserNameAsync(user) ?? "User";
+                passkeyUserEntity = new PasskeyUserEntity(userId, userName, displayName: userName);
             }
-
-            var userId = await userManager.GetUserIdAsync(user);
-            var userName = await userManager.GetUserNameAsync(user) ?? "User";
-            var userEntity = new PasskeyUserEntity(userId, userName, displayName: userName);
-            var passkeyCreationArgs = new PasskeyCreationArgs(userEntity);
+            
+            // 2. Fall back to usernameless passkey
+            if (passkeyUserEntity == null)
+            {
+                var userIdentifier = Guid.NewGuid().ToString();
+                passkeyUserEntity = new PasskeyUserEntity(userIdentifier, userIdentifier, displayName: "Unnamed passkey");
+            }
+            
+            var passkeyCreationArgs = new PasskeyCreationArgs(passkeyUserEntity);
             var options = await signInManager.ConfigurePasskeyCreationOptionsAsync(passkeyCreationArgs);
             return TypedResults.Content(options.AsJson(), contentType: "application/json");
         });
