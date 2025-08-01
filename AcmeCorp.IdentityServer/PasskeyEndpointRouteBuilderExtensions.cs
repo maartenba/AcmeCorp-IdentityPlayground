@@ -10,6 +10,23 @@ public static class PasskeyEndpointRouteBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(endpoints);
 
+        endpoints.MapGet("/.well-known/passkey-endpoints", async (
+                HttpContext http,
+                CancellationToken cancellationToken) =>
+            {
+                // https://w3c.github.io/webappsec-passkey-endpoints/
+            
+                http.Response.Headers.ContentType = "application/json";
+                await http.Response.WriteAsync(
+                    """
+                    {
+                        "enroll": "https://localhost:5443/identity/account/manage/passkeys",
+                        "manage": "https://localhost:5443/identity/account/manage/passkeys"
+                    }
+                    """, cancellationToken: cancellationToken);
+            })
+            .ExcludeFromDescription();
+        
         var accountGroup = endpoints.MapGroup("/Identity/Account").ExcludeFromDescription();
         
         accountGroup.MapPost("/PasskeyCreationOptions", async (
