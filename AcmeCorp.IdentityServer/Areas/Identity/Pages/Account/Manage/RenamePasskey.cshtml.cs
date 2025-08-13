@@ -95,7 +95,7 @@ public class RenamePasskeyModel : PageModel
         // Rename
         passkey.Name = Input?.Name;
         
-        var result = await _userManager.SetPasskeyAsync(user, passkey);
+        var result = await _userManager.AddOrUpdatePasskeyAsync(user, passkey);
         if (!result.Succeeded)
         {
             var userId = await _userManager.GetUserIdAsync(user);
@@ -106,7 +106,7 @@ public class RenamePasskeyModel : PageModel
         var passkeyEntity = await _dbContext.UserPasskeys.SingleOrDefaultAsync(userPasskey => userPasskey.CredentialId.SequenceEqual(credentialId));
         if (passkeyEntity != null)
         {
-            passkeyEntity.Name = Input?.Name;
+            passkeyEntity.Data.Name = Input?.Name;
             await _dbContext.SaveChangesAsync();
         }
         

@@ -118,22 +118,15 @@ public class PasskeysModel : PageModel
             StatusMessage = "The browser did not provide a passkey.";
             return RedirectToPage();
         }
-        
-        var options = await _signInManager.RetrievePasskeyCreationOptionsAsync();
-        if (options is null)
-        {
-            StatusMessage = "Could not retrieve passkey creation options.";
-            return RedirectToPage();
-        }
 
-        var attestationResult = await _signInManager.PerformPasskeyAttestationAsync(Input.Passkey.CredentialJson, options);
+        var attestationResult = await _signInManager.PerformPasskeyAttestationAsync(Input.Passkey.CredentialJson);
         if (!attestationResult.Succeeded)
         {
             StatusMessage = $"Could not add the passkey: {attestationResult.Failure.Message}.";
             return RedirectToPage();
         }
 
-        var setPasskeyResult = await _userManager.SetPasskeyAsync(user, attestationResult.Passkey);
+        var setPasskeyResult = await _userManager.AddOrUpdatePasskeyAsync(user, attestationResult.Passkey);
         if (!setPasskeyResult.Succeeded)
         {
             StatusMessage = "The passkey could not be added to your account.";

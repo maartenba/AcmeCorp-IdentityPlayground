@@ -28,13 +28,17 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
         options.SignIn.RequireConfirmedAccount = true;
         
         options.Stores.SchemaVersion = IdentitySchemaVersions.Version3;
-
-        // Explicitly add https://localhost:5443 to overcome local Kestrel sometimes not providing current origin while debugging
-        // Do not add this in production!
-        options.Passkey.AllowedOrigins = [ "https://localhost:5443" ];
     })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.Configure<IdentityPasskeyOptions>(options =>
+{
+    // Explicitly add https://localhost:5443 to overcome local Kestrel sometimes not providing current origin while debugging
+    // Do not add this in production!
+    options.ValidateOrigin = context => ValueTask.FromResult(
+        !context.CrossOrigin || context.Origin == "https://localhost:5443");
+});
 
 builder.Services
     .AddIdentityServer(options =>

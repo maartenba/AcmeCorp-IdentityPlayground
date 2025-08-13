@@ -100,21 +100,10 @@ public class Index : PageModel
             // When performing passkey sign-in, don't perform form validation.
             ModelState.Clear();
             
-            // Retrieve passkey options
-            var options = await _signInManager.RetrievePasskeyRequestOptionsAsync();
-            if (options is null)
-            {
-                ModelState.AddModelError(string.Empty, "Could not complete passkey login. Please try again.");
-                await BuildModelAsync(Input.ReturnUrl);
-                return Page();
-            }
-            
-            result = await _signInManager.PasskeySignInAsync(Input.Passkey.CredentialJson, options);
+            result = await _signInManager.PasskeySignInAsync(Input.Passkey.CredentialJson);
             if (result.Succeeded)
             {
-                user = options.UserId is { Length: > 0 } userId 
-                    ? await _userManager.FindByIdAsync(userId) 
-                    : await _userManager.GetUserAsync(User);
+                user = await _userManager.GetUserAsync(User);
             }
         }
         else if (ModelState.IsValid)

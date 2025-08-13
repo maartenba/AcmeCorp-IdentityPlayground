@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace AcmeCorp.IdentityServer;
@@ -5,6 +6,8 @@ namespace AcmeCorp.IdentityServer;
 [HtmlTargetElement("passkey-submit")]
 public class PasskeySubmitTagHelper : TagHelper
 {
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
     [HtmlAttributeName("operation")]
     public PasskeyOperation Operation { get; set; }
 
@@ -14,8 +17,17 @@ public class PasskeySubmitTagHelper : TagHelper
     [HtmlAttributeName("email-name")]
     public string? EmailName { get; set; }
 
+    public PasskeySubmitTagHelper(IHttpContextAccessor httpContextAccessor)
+    {
+        _httpContextAccessor = httpContextAccessor;
+    }
+
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+        // Get tokens
+        var tokens = _httpContextAccessor.HttpContext?.RequestServices
+            .GetService<IAntiforgery>()?.GetTokens(_httpContextAccessor.HttpContext);
+        
         // Button is the main element we want to create, capture all attributes etc.
         var buttonAttributes = output.Attributes.Where(it => it.Name != "operation" && it.Name != "name" && it.Name != "email-name").ToList();
         var buttonContent = (await output.GetChildContentAsync(NullHtmlEncoder.Default))
@@ -42,6 +54,8 @@ public class PasskeySubmitTagHelper : TagHelper
         htmlWriter.Write($"operation=\"{Operation}\" ");
         htmlWriter.Write($"name=\"{Name}\" ");
         htmlWriter.Write($"email-name=\"{EmailName ?? ""}\" ");
+        htmlWriter.Write($"request-token-name=\"{tokens?.HeaderName ?? ""}\" ");
+        htmlWriter.Write($"request-token-value=\"{tokens?.RequestToken ?? ""}\" ");
         htmlWriter.Write(">");
         htmlWriter.Write("</passkey-submit>");
         

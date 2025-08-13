@@ -1,3 +1,9 @@
+const browserSupportsPasskeys =
+    typeof navigator.credentials !== 'undefined' &&
+    typeof window.PublicKeyCredential !== 'undefined' &&
+    typeof window.PublicKeyCredential.parseCreationOptionsFromJSON === 'function' &&
+    typeof window.PublicKeyCredential.parseRequestOptionsFromJSON === 'function';
+
 async function fetchWithErrorHandling(url, options = {}) {
     const response = await fetch(url, {
         credentials: 'include',
@@ -11,9 +17,10 @@ async function fetchWithErrorHandling(url, options = {}) {
     return response;
 }
 
-async function createCredential(signal) {
+async function createCredential(headers, signal) {
     const optionsResponse = await fetchWithErrorHandling('/Identity/Account/PasskeyCreationOptions', {
         method: 'POST',
+        headers,
         signal,
     });
     const optionsJson = await optionsResponse.json();
@@ -21,9 +28,10 @@ async function createCredential(signal) {
     return await navigator.credentials.create({ publicKey: options, signal });
 }
 
-async function requestCredential(email, mediation, signal) {
+async function requestCredential(email, mediation, headers, signal) {
     const optionsResponse = await fetchWithErrorHandling(`/Identity/Account/PasskeyRequestOptions?username=${email}`, {
         method: 'POST',
+        headers,
         signal,
     });
     const optionsJson = await optionsResponse.json();
@@ -40,12 +48,14 @@ customElements.define('passkey-submit', class extends HTMLElement {
             operation: this.getAttribute('operation'),
             name: this.getAttribute('name'),
             emailName: this.getAttribute('email-name'),
+            requestTokenName: this.getAttribute('request-token-name'),
+            requestTokenValue: this.getAttribute('request-token-value'),
         };
 
         this.internals.form.addEventListener('submit', (event) => {
             if (event.submitter?.name === '__passkeySubmit') {
                 event.preventDefault();
-                this.obtainCredentialAndSubmit();
+                this.obtainAndSubmitCredential();
             }
         });
 
@@ -56,22 +66,33 @@ customElements.define('passkey-submit', class extends HTMLElement {
         this.abortController?.abort();
     }
 
-    async obtainCredentialAndSubmit(useConditionalMediation = false) {
+    async obtainCredential(useConditionalMediation, signal) {
+        if (!browserSupportsPasskeys) {
+            throw new Error('Some passkey features are missing. Please update your browser.');
+        }
+
+        const headers = {
+            [this.attrs.requestTokenName]: this.attrs.requestTokenValue,
+        };
+
+        if (this.attrs.operation === 'Create') {
+            return await createCredential(headers, signal);
+        } else if (this.attrs.operation === 'Request') {
+            const email = new FormData(this.internals.form).get(this.attrs.emailName);
+            const mediation = useConditionalMediation ? 'conditional' : undefined;
+            return await requestCredential(email, mediation, headers, signal);
+        } else {
+            throw new Error(`Unknown passkey operation '${this.attrs.operation}'.`);
+        }
+    }
+
+    async obtainAndSubmitCredential(useConditionalMediation = false) {
         this.abortController?.abort();
         this.abortController = new AbortController();
         const signal = this.abortController.signal;
         const formData = new FormData();
         try {
-            let credential;
-            if (this.attrs.operation === 'Create') {
-                credential = await createCredential(signal);
-            } else if (this.attrs.operation === 'Request') {
-                const email = new FormData(this.internals.form).get(this.attrs.emailName);
-                const mediation = useConditionalMediation ? 'conditional' : undefined;
-                credential = await requestCredential(email, mediation, signal);
-            } else {
-                throw new Error(`Unknown passkey operation '${operation}'.`);
-            }
+            const credential = await this.obtainCredential(useConditionalMediation, signal);
 
             let credentialJson = "";
             try {
@@ -106,11 +127,19 @@ customElements.define('passkey-submit', class extends HTMLElement {
             formData.append(`${this.attrs.name}.CredentialJson`, credentialJson);
         } catch (error) {
             if (error.name === 'AbortError') {
-                // Canceled by user action, do not submit the form
+                // The user explicitly canceled the operation - return without error.
                 return;
             }
-            formData.append(`${this.attrs.name}.Error`, error.message);
             console.error(error);
+            if (useConditionalMediation) {
+                // An error occurred during conditional mediation, which is not user-initiated.
+                // We log the error in the console but do not relay it to the user.
+                return;
+            }
+            const errorMessage = error.name === 'NotAllowedError'
+                ? 'No passkey was provided by the authenticator.'
+                : error.message;
+            formData.append(`${this.attrs.name}.Error`, errorMessage);
         }
         this.internals.setFormValue(formData);
         this.internals.form.submit();
@@ -151,8 +180,8 @@ customElements.define('passkey-submit', class extends HTMLElement {
     }
 
     async tryAutofillPasskey() {
-        if (this.attrs.operation === 'Request' && await PublicKeyCredential.isConditionalMediationAvailable()) {
-            await this.obtainCredentialAndSubmit(/* useConditionalMediation */ true);
+        if (browserSupportsPasskeys && this.attrs.operation === 'Request' && await PublicKeyCredential.isConditionalMediationAvailable?.()) {
+            await this.obtainAndSubmitCredential(/* useConditionalMediation */ true);
         }
     }
 });

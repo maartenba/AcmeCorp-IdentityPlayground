@@ -10,7 +10,7 @@
       "rollForward": false
     },
     "dotnet-ef": {
-      "version": "10.0.0-preview.6.25358.103",
+      "version": "10.0.0-preview.7.25380.108",
       "commands": [
         "dotnet-ef"
       ],
