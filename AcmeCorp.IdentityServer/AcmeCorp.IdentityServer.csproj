@@ -24,8 +24,4 @@
         </PackageReference>
     </ItemGroup>
 
-    <ItemGroup>
-      <_ContentIncludedByDefault Remove="Pages\Account\Create\Index.cshtml" />
-    </ItemGroup>
-
 </Project>

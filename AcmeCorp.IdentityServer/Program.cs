@@ -7,6 +7,7 @@ using AcmeCorp.IdentityServer.Models;
 using Duende.IdentityServer;
 using IdentityServerHost.Pages.Portal;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -120,6 +121,11 @@ builder.Services.AddLogging(configure =>
             entry.LogName == "Duende.IdentityServer.Diagnostics.Summary";
     });
 });
+
+
+builder.Services.AddDataProtection()
+    .SetApplicationName("AcmeCorp.IdentityServer")
+    .PersistKeysToFileSystem(new DirectoryInfo("./keys"));
 
 var app = builder.Build();
 
