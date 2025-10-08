@@ -5,8 +5,10 @@ using AcmeCorp.IdentityServer.Data;
 using AcmeCorp.IdentityServer.DynamicProviders;
 using AcmeCorp.IdentityServer.Models;
 using Duende.IdentityServer;
+using Duende.IdentityServer.Services;
 using IdentityServerHost.Pages.Portal;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
@@ -105,6 +107,49 @@ builder.Services.AddAuthentication()
         //
         //     return Task.CompletedTask;
         // };
+    })
+    .AddOpenIdConnect("oidc", "demo.duendesoftware.com", options =>
+    {
+        options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+        options.SignOutScheme = IdentityServerConstants.SignoutScheme;
+        options.SaveTokens = true;
+
+        options.Authority = "https://demo.duendesoftware.com";
+        options.ClientId = "interactive.confidential";
+        options.ClientSecret = "secret";
+        options.ResponseType = "code";
+
+        options.TokenValidationParameters = new()
+        {
+            NameClaimType = "name",
+            RoleClaimType = "role"
+        };
+        
+        options.Events = new OpenIdConnectEvents
+        {
+            OnRemoteFailure = async context =>
+            {
+                var returnUrl = context.Properties?.Items["returnUrl"];
+                if (!string.IsNullOrEmpty(returnUrl))
+                {
+                    var interactionService = context.HttpContext.RequestServices.GetRequiredService<IIdentityServerInteractionService>();
+                    var authorizationRequest = await interactionService.GetAuthorizationContextAsync(returnUrl);
+                    
+                    var redirectUrl = authorizationRequest?.Client.RedirectUris.FirstOrDefault();
+                    
+                    if (!string.IsNullOrEmpty(redirectUrl))
+                    {
+                        // note: may want to add logging
+                        
+                        // note: redirect URL will typically be the /signin-oidc callback path of the app,
+                        // stripping that off here to redirect to app root without further detail
+                        
+                        context.HandleResponse();
+                        context.Response.Redirect(redirectUrl.Replace("/signin-oidc", ""));
+                    }
+                }
+            }
+        };
     });
 
 builder.Services.AddSingleton<ClientRepository>();
