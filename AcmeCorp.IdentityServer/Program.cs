@@ -2,10 +2,15 @@ using System.Text;
 using System.Text.Json;
 using AcmeCorp.IdentityServer;
 using AcmeCorp.IdentityServer.Data;
+using AcmeCorp.IdentityServer.DynamicClientRegistration;
 using AcmeCorp.IdentityServer.DynamicProviders;
 using AcmeCorp.IdentityServer.Models;
+using Duende.IdentityModel;
 using Duende.IdentityServer;
+using Duende.IdentityServer.Configuration;
+using Duende.IdentityServer.Configuration.Validation.DynamicClientRegistration;
 using Duende.IdentityServer.Services;
+using Duende.IdentityServer.Stores;
 using IdentityServerHost.Pages.Portal;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -46,6 +51,8 @@ builder.Services.Configure<IdentityPasskeyOptions>(options =>
 builder.Services
     .AddIdentityServer(options =>
     {
+        options.Discovery.DynamicClientRegistration.RegistrationEndpointMode = RegistrationEndpointMode.Inferred;
+        
         options.Events.RaiseErrorEvents = true;
         options.Events.RaiseInformationEvents = true;
         options.Events.RaiseFailureEvents = true;
@@ -172,6 +179,12 @@ builder.Services.AddDataProtection()
     .SetApplicationName("AcmeCorp.IdentityServer")
     .PersistKeysToFileSystem(new DirectoryInfo("./keys"));
 
+// MCP - Add dynamic client registration + some plumbing to make in-memory DCR work.
+builder.Services.AddIdentityServerConfiguration(_ => { })
+    .AddInMemoryClientConfigurationStore();
+builder.Services.AddTransient<IDynamicClientRegistrationValidator, CustomDynamicClientRegistrationValidator>();
+// --
+    
 var app = builder.Build();
 
 app.UseIdentityServer();
@@ -185,6 +198,31 @@ app.MapHealthChecks("health", new HealthCheckOptions
 });
 app.MapPasskeyEndpoints();
 app.MapRazorPages().RequireAuthorization();
+app.MapDynamicClientRegistration();
+
+// MCP - This is a hack to provide an oauth discovery document (RFC 8414), which will be included in IdentityServer 7.4
+// app.MapGet("/.well-known/oauth-authorization-server", async (
+//     HttpContext http,
+//     [FromServices]IEnumerable<Duende.IdentityServer.Hosting.Endpoint> endpoints) =>
+// {
+//     var endpoint = endpoints.FirstOrDefault(x => x.Name == IdentityServerConstants.EndpointNames.Discovery);
+//     if (endpoint != null)
+//     {
+//         var handler = http.RequestServices.GetRequiredService(endpoint.Handler) as IEndpointHandler;
+//         if (handler != null)
+//         {
+//             var result = await handler.ProcessAsync(http);
+//             if (result is DiscoveryDocumentResult)
+//             {
+//                 await result.ExecuteAsync(http);
+//                 return;
+//             }
+//         }
+//     }
+//     
+//     throw new Exception("Could not find discovery endpoint.");
+// });
+// --
 
 await SeedData.EnsureSeedDataAsync(app);
 app.Run();

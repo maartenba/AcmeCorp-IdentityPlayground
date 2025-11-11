@@ -12,6 +12,8 @@
         <PackageReference Include="IdentityModel" Version="7.0.0" />
         <PackageReference Include="IdentityModel.OidcClient" Version="6.0.0" />
         <PackageReference Include="IdentityModel.OidcClient.IdentityTokenValidator" Version="6.0.0" />
+        <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.14.0" />
+        <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.14.0" />
     </ItemGroup>
 
 </Project>

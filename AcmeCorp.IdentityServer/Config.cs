@@ -18,7 +18,11 @@ public static class Config
     public static IEnumerable<ApiScope> ApiScopes =>
     [
         new("weatherapi.read", "Weather API read access"),
-        new("weatherapi.write", "Weather API write access")
+        new("weatherapi.write", "Weather API write access"),
+        
+        new("mcp:tools"),
+        new("mcp:read"),
+        new("mcp:prompts")
     ];
 
     public static IEnumerable<ApiResource> ApiResources => new[]
@@ -27,7 +31,14 @@ public static class Config
         {
             Scopes = { "weatherapi.read", "weatherapi.write" },
             ApiSecrets = { new Secret("ScopeSecret".Sha256()) },
-            UserClaims = { "email", "role" }
+            UserClaims = { "email", "role" },
+        },
+        
+        new ApiResource("http://localhost:5200/")
+        {
+            Scopes = { "mcp:tools", "mcp:read", "mcp:prompts", "weatherapi.read" },
+            ApiSecrets = { new Secret("ScopeSecret".Sha256()) },
+            UserClaims = { "email", "role" },
         }
     };
 
