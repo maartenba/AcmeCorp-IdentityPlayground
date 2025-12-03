@@ -1,8 +1,10 @@
 using AcmeCorp.WeatherApp.Models;
 using AcmeCorp.WeatherApp.Services;
 using Duende.IdentityModel.Client;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
