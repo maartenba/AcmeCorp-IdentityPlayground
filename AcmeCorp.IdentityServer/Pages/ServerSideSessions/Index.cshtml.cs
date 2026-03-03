@@ -53,7 +53,7 @@ namespace IdentityServerHost.Pages.ServerSideSessions
                     DisplayName = DisplayNameFilter,
                     SessionId = SessionIdFilter,
                     SubjectId = SubjectIdFilter
-                });
+                }, HttpContext.RequestAborted);
             }
             return Page();
         }
@@ -71,7 +71,7 @@ namespace IdentityServerHost.Pages.ServerSideSessions
 
             await _sessionManagementService.RemoveSessionsAsync(new RemoveSessionsContext { 
                 SessionId = SessionId,
-            });
+            }, HttpContext.RequestAborted);
             return RedirectToPage("/ServerSideSessions/Index", new { Token, DisplayNameFilter, SessionIdFilter, SubjectIdFilter, Prev });
         }
     }

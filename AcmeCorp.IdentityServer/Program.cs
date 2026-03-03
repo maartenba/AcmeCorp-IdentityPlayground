@@ -133,7 +133,7 @@ builder.Services.AddAuthentication()
                 if (!string.IsNullOrEmpty(returnUrl))
                 {
                     var interactionService = context.HttpContext.RequestServices.GetRequiredService<IIdentityServerInteractionService>();
-                    var authorizationRequest = await interactionService.GetAuthorizationContextAsync(returnUrl);
+                    var authorizationRequest = await interactionService.GetAuthorizationContextAsync(returnUrl, context.HttpContext.RequestAborted);
                     
                     var redirectUrl = authorizationRequest?.Client.RedirectUris.FirstOrDefault();
                     
