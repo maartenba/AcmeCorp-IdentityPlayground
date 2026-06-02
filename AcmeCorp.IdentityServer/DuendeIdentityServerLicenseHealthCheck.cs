@@ -1,4 +1,3 @@
-using Duende.IdentityServer;
 using Duende.IdentityServer.Licensing;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
@@ -7,7 +6,7 @@ namespace AcmeCorp.IdentityServer;
 public class DuendeIdentityServerLicenseHealthCheck(
     IHostEnvironment environment,
     LicenseUsageSummary? licenseUsageSummary,
-    IdentityServerLicense? license = null)
+    LicenseInformation? license = null)
     : IHealthCheck
 {
     public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)

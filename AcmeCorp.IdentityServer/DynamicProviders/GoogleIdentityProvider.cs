@@ -2,7 +2,7 @@ using Duende.IdentityServer.Models;
 
 namespace AcmeCorp.IdentityServer.DynamicProviders;
 
-public class GoogleIdentityProvider : IdentityProvider
+public record GoogleIdentityProvider : IdentityProvider
 {
     public const string ProviderType = "google";
     
