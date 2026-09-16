@@ -56,9 +56,9 @@ builder.Services
         options.PushedAuthorization.AllowUnregisteredPushedRedirectUris = true;
         
         options.DynamicProviders.PathPrefix = "/federation";
-        options.DynamicProviders
-            .AddProviderType<GoogleHandler, GoogleOptions, GoogleIdentityProvider>(
-                GoogleIdentityProvider.ProviderType);
+        //options.DynamicProviders
+        //    .AddProviderType<GoogleHandler, GoogleOptions, GoogleIdentityProvider>(
+        //        GoogleIdentityProvider.ProviderType);
 
         options.ServerSideSessions.UserDisplayNameClaimType = "name"; // this sets the "name" claim as the display name in the admin tool
         options.ServerSideSessions.RemoveExpiredSessions = true; // removes expired sessions. defaults to true.
